@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node-dev src/app.ts"
+    "start": "ts-node-dev src/app.ts",
+    "dev": "env-cmd ts-node-dev src/app.ts",
+    "repl": "env-cmd ts-node-dev src/app.ts"
   },
   "repository": {
     "type": "git",
@@ -30,6 +32,7 @@
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
+    "env-cmd": "^10.1.0",
     "express": "^4.18.2",
     "firebase": "^9.23.0",
     "jsonwebtoken": "^9.0.2",
