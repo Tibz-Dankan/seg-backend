@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("SEG_DATABASE_URL")
+}
+
+enum Role {
+  admin
+  superadmin
+}
+
+enum Gender {
+  male
+  female
+}
+
+model User {
+  userId                 String        @id @default(uuid())
+  firstName              String        @db.Text
+  lastName               String        @db.Text
+  email                  String        @unique @db.Text
+  gender                 Gender
+  role                   Role          @default(admin)
+  password               String        @db.Text
+  imageUrl               String?       @db.Text
+  imagePath              String?       @db.Text
+  passwordResetToken     String?       @db.Text
+  passwordResetExpiresAt DateTime?
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime?     @updatedAt
+  AccessTokens           AccessToken[]
+  SignupToken            SignupToken[]
+
+  @@index([userId])
+  @@index([email])
+  @@index([passwordResetToken])
+  @@map("_users")
+}
+
+model SignupToken {
+  tokenId           String    @id @default(uuid())
+  User              User      @relation(fields: [generatedByUserId], references: [userId])
+  generatedByUserId String    @db.Text
+  token             Int
+  associatedEmail   String    @db.Text
+  used              Boolean   @default(false)
+  usedAt            DateTime?
+  expiresAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime? @updatedAt
+
+  @@index([tokenId])
+  @@index([generatedByUserId])
+  @@index([token])
+  @@map("_signup_tokens")
+}
+
+model AccessToken {
+  tokenId   String    @id @default(uuid())
+  User      User      @relation(fields: [userId], references: [userId])
+  userId    String
+  token     String    @db.Text
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@index([tokenId])
+  @@index([userId])
+  @@index([token])
+  @@map("_access_tokens")
+}
+
+// PRISMA COMMNANDS 
+
+// INITIALIZE PRISMA
+// npx prisma init --datasource-provider postgresql
+
+// APPLY CHANGES TO ACTUAL DATABASE 
+// npx prisma migrate dev --name test
+
+// GENERATE THE CLIENT TO INTERACT WITH THE DATABASE
+// npx prisma generate
+
+// TO EXPLORE AND MANUPLATE DATA USE PRISMA STUDIO
+// npx prisma studio
