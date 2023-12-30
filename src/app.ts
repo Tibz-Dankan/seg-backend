@@ -32,8 +32,8 @@ app.use("*", (req: Request, res: Response) => {
   });
 });
 
-const PORT = 3000 || process.env.PORT;
+// const PORT = 3000 || process.env.PORT;
 
-server.listen(PORT, () => {
-  console.log(`SEG server running on port ${PORT}`);
-});
+// server.listen(PORT, () => {
+//   console.log(`SEG server running on port ${PORT}`);
+// });
