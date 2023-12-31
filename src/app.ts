@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import logger from "morgan";
 import http from "http";
 import { errorController } from "./controllers/errorController";
+import { userRoutes } from "./routes/userRoutes";
 
 dotenv.config();
 
@@ -21,7 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logger("dev"));
 
-// API Routes here
+app.use("/api/v1/users", userRoutes);
 
 app.use(errorController);
 
