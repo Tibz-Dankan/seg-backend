@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import logger from "morgan";
 import http from "http";
 import { errorController } from "./controllers/errorController";
+import { rateLimitController } from "./controllers/rateLimitController";
 import { userRoutes } from "./routes/userRoutes";
 import { tokenRoutes } from "./routes/tokenRoutes";
 
@@ -22,6 +23,8 @@ const server = http.createServer(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logger("dev"));
+
+app.use(rateLimitController);
 
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/tokens", tokenRoutes);
