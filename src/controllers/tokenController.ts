@@ -3,29 +3,67 @@ import { AppError } from "../utils/error";
 import { asyncHandler } from "../utils/asyncHandler";
 import { PrismaClient } from "@prisma/client";
 import { RandomNumber } from "../utils/random";
+import { Role } from "../types/role";
 
 const prisma = new PrismaClient();
 const SignupToken = prisma.signupToken;
+
+export const updateSignupTokenAsUsed = async (tokenId: string) => {
+  const currentDateISOString = new Date(Date.now()).toISOString();
+
+  await SignupToken.update({
+    where: { tokenId: tokenId },
+    data: {
+      used: true,
+      usedAt: currentDateISOString,
+      expiresAt: currentDateISOString,
+    },
+  });
+};
+
+const validateRole = (role: string): boolean => {
+  const isAdmin = role === Role.ADMIN;
+  const isSuperAdmin = role === Role.SUPERADMIN;
+
+  if (isAdmin || isSuperAdmin) {
+    return true;
+  }
+  return false;
+};
 
 export const generateSignupToken = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = res.locals.user.userId as string;
     const associatedEmail = req.body.associatedEmail as string;
+    const associatedRole = req.body.associatedRole as Role;
 
     if (!userId) {
       return next(new AppError("Please provide userId", 400));
+    }
+    if (!associatedRole) {
+      return next(
+        new AppError("Please provide role to associated with token", 400)
+      );
+    }
+    if (!validateRole(associatedRole)) {
+      return next(new AppError("Please provide a valid role", 400));
     }
     if (!associatedEmail.includes("@")) {
       return next(new AppError("Please provide a valid email", 400));
     }
 
     const token = new RandomNumber().d8();
+    const tokenExpiresAt = new Date(
+      Date.now() + 24 * 60 * 60 * 1000
+    ).toISOString(); //24 hours
 
     const newToken = await SignupToken.create({
       data: {
         token: token,
         associatedEmail: associatedEmail,
+        associatedRole: associatedRole,
         generatedByUserId: userId,
+        expiresAt: tokenExpiresAt,
       },
       select: {
         tokenId: true,
@@ -160,5 +198,34 @@ export const deleteSignupToken = asyncHandler(
       status: "success",
       message: "Signup Token deleted successfully",
     });
+  }
+);
+
+export const validateSignupToken = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const token = parseInt(req.body.signupToken);
+
+    if (!token) {
+      return next(new AppError("Please provide signup token!", 403));
+    }
+    const dbToken = await SignupToken.findFirst({
+      where: { token: { equals: token } },
+    });
+
+    if (!dbToken) {
+      return next(new AppError("Couldn't find token match!", 403));
+    }
+
+    const tokenExpiry = dbToken.expiresAt as Date;
+    const tokenIsExpired = new Date(Date.now()) > new Date(tokenExpiry);
+
+    if (dbToken.used || tokenIsExpired) {
+      return next(
+        new AppError("Signup token is already used or expired!", 403)
+      );
+    }
+
+    res.locals.dbToken = dbToken;
+    next();
   }
 );

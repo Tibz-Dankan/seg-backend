@@ -8,11 +8,11 @@ import { hash, compare, genSalt } from "bcryptjs";
 import { RandomNumber } from "../utils/random";
 import { Upload } from "../utils/upload";
 import mime from "mime-types";
+import { updateSignupTokenAsUsed } from "./tokenController";
 
 const prisma = new PrismaClient();
 const User = prisma.user;
 const AccessToken = prisma.accessToken;
-const SignupToken = prisma.signupToken;
 
 const signAccessToken = (userId: number) => {
   const jwtSecret = process.env.JWT_SECRET!;
@@ -63,6 +63,7 @@ export const signUp = asyncHandler(
     const phoneNumber = req.body.phoneNumber as string;
     const email = req.body.email as string;
     const password = req.body.password as string;
+    const dbToken = res.locals.dbToken;
 
     if (!email || !phoneNumber || !firstName || !lastName || !password) {
       return next(new AppError("Please fill out all fields", 400));
@@ -70,11 +71,11 @@ export const signUp = asyncHandler(
     const user = await User.findFirst({
       where: { email: { equals: email } },
     });
-    if (user) return next(new AppError("phone number already taken", 400));
+    if (user) return next(new AppError("Email already taken", 400));
 
     const salt = await genSalt(10);
     req.body.password = await hash(req.body.password, salt);
-    req.body.role = "seller";
+    req.body.role = dbToken.associatedRole;
 
     const newUser = await User.create({
       data: req.body,
@@ -83,9 +84,11 @@ export const signUp = asyncHandler(
         firstName: true,
         lastName: true,
         phoneNumber: true,
+        role: true,
         imageUrl: true,
       },
     });
+    updateSignupTokenAsUsed(dbToken.tokenId);
 
     authenticate(newUser, 201, res);
   }

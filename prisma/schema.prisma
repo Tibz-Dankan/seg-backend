@@ -47,6 +47,7 @@ model SignupToken {
   generatedByUserId String    @db.Text
   token             Int
   associatedEmail   String    @db.Text
+  associatedRole    Role      @default(admin)
   used              Boolean   @default(false)
   usedAt            DateTime?
   expiresAt         DateTime?

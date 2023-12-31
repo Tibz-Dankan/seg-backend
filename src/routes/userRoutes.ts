@@ -11,10 +11,11 @@ import {
   getUser,
 } from "../controllers/userController";
 import { uploadFile } from "../utils/upload";
+import { validateSignupToken } from "../controllers/tokenController";
 
 const router = express.Router();
 
-router.post("/signup", signUp);
+router.post("/signup", validateSignupToken, signUp);
 router.post("/signin", signIn);
 router.post("/forgot-password", forgotPassword);
 router.patch("/reset-password", resetPassword);
