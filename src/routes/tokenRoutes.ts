@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../controllers/userController";
+import { protectSuperAdmin } from "../controllers/userController";
 import {
   generateSignupToken,
   getSignupTokensByGeneratedByUserId,
@@ -10,10 +10,14 @@ import {
 
 const router = express.Router();
 
-router.post("/generate-signup-token", protect, generateSignupToken);
-router.get("/get-signup-token", protect, getSignupTokensByGeneratedByUserId);
-router.get("/get-all-token", protect, getAllSignupTokens);
-router.patch("/edit-signup-token", protect, editSignupToken);
-router.delete("/delete-signup-token", protect, deleteSignupToken);
+router.post("/generate-signup-token", protectSuperAdmin, generateSignupToken);
+router.get(
+  "/get-signup-tokens",
+  protectSuperAdmin,
+  getSignupTokensByGeneratedByUserId
+);
+router.get("/get-all-tokens", protectSuperAdmin, getAllSignupTokens);
+router.patch("/edit-signup-token", protectSuperAdmin, editSignupToken);
+router.delete("/delete-signup-token", protectSuperAdmin, deleteSignupToken);
 
 export { router as tokenRoutes };
