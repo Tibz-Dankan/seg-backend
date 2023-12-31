@@ -82,7 +82,7 @@ export const signUp = asyncHandler(
         userId: true,
         firstName: true,
         lastName: true,
-        // phoneNumber: true,
+        phoneNumber: true,
         imageUrl: true,
       },
     });

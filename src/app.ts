@@ -5,6 +5,7 @@ import logger from "morgan";
 import http from "http";
 import { errorController } from "./controllers/errorController";
 import { userRoutes } from "./routes/userRoutes";
+import { tokenRoutes } from "./routes/tokenRoutes";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(logger("dev"));
 
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/tokens", tokenRoutes);
 
 app.use(errorController);
 
