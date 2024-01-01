@@ -1,8 +1,16 @@
 import { rateLimit } from "express-rate-limit";
 
+let requestLimit: number;
+
+if (process.env.NODE_ENV === "test") {
+  requestLimit = 40;
+} else {
+  requestLimit = 12;
+}
+
 export const rateLimitController = rateLimit({
   windowMs: 60 * 1000, // 1 min
-  limit: 12,
+  limit: requestLimit,
   message: "Too many requests",
   legacyHeaders: true,
 });
