@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 import { hash, compare, genSalt } from "bcryptjs";
 import { Upload } from "../utils/upload";
+import { Email } from "../utils/email";
 import mime from "mime-types";
 import { updateSignupTokenAsUsed } from "./tokenController";
 
@@ -145,9 +146,8 @@ export const forgotPassword = asyncHandler(
     const resetURL = `${req.protocol}://seg-muk-chapter.netlify.app/reset-password/${resetToken}`;
     // const resetURL = `${req.protocol}://localhost:5173/reset-password/${resetToken}`;
     console.log("resetURL", resetURL);
-
     const subject = "Reset Password";
-    // await new Email(email, subject).sendPasswordReset(resetURL, user.firstName);
+    await new Email(email, subject).sendPasswordReset(resetURL, user.firstName);
 
     res.status(200).json({
       status: "success",
