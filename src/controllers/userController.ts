@@ -136,7 +136,7 @@ export const forgotPassword = asyncHandler(
     const email = req.body.email as string;
 
     if (!email) {
-      return next(new AppError("Please fill out all fields", 400));
+      return next(new AppError("Please provide your email", 400));
     }
     const user = await User.findFirst({
       where: { email: { equals: email } },
