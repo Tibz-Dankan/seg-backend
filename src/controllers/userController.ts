@@ -1,11 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "../utils/error";
 import { asyncHandler } from "../utils/asyncHandler";
-import { createHash } from "crypto";
+import { randomBytes, createHash } from "crypto";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 import { hash, compare, genSalt } from "bcryptjs";
-import { RandomNumber } from "../utils/random";
 import { Upload } from "../utils/upload";
 import mime from "mime-types";
 import { updateSignupTokenAsUsed } from "./tokenController";
@@ -107,7 +106,7 @@ export const signIn = asyncHandler(
     });
 
     if (!user || !(await compare(password, user.password))) {
-      return next(new AppError("Wrong number or password", 400));
+      return next(new AppError("Wrong email or password", 400));
     }
     authenticate(user, 200, res);
   }
@@ -130,9 +129,7 @@ export const forgotPassword = asyncHandler(
       );
     }
 
-    // To revise the resetToken
-    const resetToken = new RandomNumber().d6().toString();
-    console.log(resetToken);
+    const resetToken = randomBytes(32).toString("hex");
     const hashedToken = createHash("sha256").update(resetToken).digest("hex");
 
     await User.update({
@@ -145,10 +142,12 @@ export const forgotPassword = asyncHandler(
       },
     });
 
-    // const phoneNumberString = `${user.phoneNumber}`;
-    // await new SMS(phoneNumberString).sendPasswordReset(resetToken);
+    const resetURL = `${req.protocol}://seg-muk-chapter.netlify.app/reset-password/${resetToken}`;
+    // const resetURL = `${req.protocol}://localhost:5173/reset-password/${resetToken}`;
+    console.log("resetURL", resetURL);
 
-    // Send email here
+    const subject = "Reset Password";
+    // await new Email(email, subject).sendPasswordReset(resetURL, user.firstName);
 
     res.status(200).json({
       status: "success",
@@ -157,35 +156,34 @@ export const forgotPassword = asyncHandler(
   }
 );
 
-// Todo: to revise the reset password logic
 export const resetPassword = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.body.userId as string;
     const newPassword = req.body.password as string;
+    const token = req.params.token;
 
-    if (!userId) return next(new AppError("We can't identify this user", 403));
+    if (!token) return next(new AppError("Please provide a reset token", 400));
+    const hashedToken = createHash("sha256").update(token).digest("hex");
+
+    const user = await User.findFirst({
+      where: {
+        passwordResetToken: { equals: hashedToken },
+        passwordResetExpiresAt: { gt: new Date(Date.now()).toISOString() },
+      },
+    });
+
+    if (!user) return next(new AppError("Invalid or expired token", 400));
 
     if (!newPassword) {
       return next(new AppError("Please provide your new password", 400));
     }
 
-    const user = await User.findFirst({
-      where: {
-        userId: { equals: userId },
-      },
-    });
-    if (!user) {
-      return next(new AppError("We couldn't user", 404));
-    }
     const salt = await genSalt(10);
     user.password = await hash(req.body.password, salt);
     user.passwordResetToken = null;
     user.passwordResetExpiresAt = null;
 
     await User.update({
-      where: {
-        userId: user.userId,
-      },
+      where: { userId: user.userId },
       data: user,
     });
 
@@ -244,9 +242,7 @@ export const protectSuperAdmin = asyncHandler(
     const userId = decoded.userId;
 
     const user = await User.findFirst({
-      where: {
-        userId: { equals: userId },
-      },
+      where: { userId: { equals: userId } },
     });
 
     if (!user) {
@@ -274,9 +270,7 @@ export const editUserDetails = asyncHandler(
     if (!lastName) return next(new AppError("Please provide last name", 400));
 
     const user = await User.findFirst({
-      where: {
-        userId: { equals: userId },
-      },
+      where: { userId: { equals: userId } },
     });
     if (!user) {
       return next(new AppError("we couldn't find user with userId", 404));
@@ -286,9 +280,7 @@ export const editUserDetails = asyncHandler(
     user.gender = req.body.gender;
 
     await User.update({
-      where: {
-        userId: user.userId,
-      },
+      where: { userId: user.userId },
       data: user,
     });
 
@@ -313,10 +305,9 @@ export const updateUserImage = asyncHandler(
     if (!isImage) {
       return next(new AppError("Please provide file of image type", 400));
     }
+
     const user = await User.findFirst({
-      where: {
-        userId: { equals: userId },
-      },
+      where: { userId: { equals: userId } },
     });
     if (!user) {
       return next(
@@ -331,9 +322,7 @@ export const updateUserImage = asyncHandler(
     user.imagePath = imagePath;
 
     await User.update({
-      where: {
-        userId: userId,
-      },
+      where: { userId: userId },
       data: user,
     });
 
@@ -351,9 +340,7 @@ export const changePassword = asyncHandler(
     const newPassword = req.body.newPassword as string;
 
     const user = await User.findFirst({
-      where: {
-        userId: { equals: userId },
-      },
+      where: { userId: { equals: userId } },
     });
     if (!user) {
       return next(new AppError("we couldn't find user with userId", 404));
@@ -370,9 +357,7 @@ export const changePassword = asyncHandler(
     user.password = await hash(newPassword, salt);
 
     await User.update({
-      where: {
-        userId: user.userId,
-      },
+      where: { userId: user.userId },
       data: user,
     });
 
@@ -392,9 +377,7 @@ export const getUser = asyncHandler(
     }
 
     const user = await User.findFirst({
-      where: {
-        userId: { equals: userId },
-      },
+      where: { userId: { equals: userId } },
       select: {
         userId: true,
         firstName: true,
