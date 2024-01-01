@@ -6,8 +6,8 @@
   "scripts": {
     "start": "ts-node-dev src/app.ts",
     "pretest": "cross-env NODE_ENV=test npx prisma migrate dev --name init",
-    "test": "cross-env NODE_ENV=test vitest",
-    "test:ui": "cross-env NODE_ENV=test vitest --ui"
+    "test": "cross-env NODE_ENV=test vitest --poolOptions.threads.singleThread",
+    "test:ui": "cross-env NODE_ENV=test vitest --poolOptions.threads.singleThread --ui"
   },
   "repository": {
     "type": "git",
