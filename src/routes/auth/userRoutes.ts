@@ -9,9 +9,9 @@ import {
   updateUserImage,
   protectAdmin,
   getUser,
-} from "../controllers/userController";
-import { uploadFile } from "../utils/upload";
-import { validateSignupToken } from "../controllers/tokenController";
+} from "../../controllers/userController";
+import { uploadFile } from "../../utils/upload";
+import { validateSignupToken } from "../../controllers/tokenController";
 
 const router = express.Router();
 

@@ -206,7 +206,7 @@ export const validateSignupToken = asyncHandler(
     const token = parseInt(req.body.signupToken);
 
     if (!token) {
-      return next(new AppError("Please provide signup token!", 403));
+      return next(new AppError("Please provide signup token!", 400));
     }
     const dbToken = await SignupToken.findFirst({
       where: { token: { equals: token } },
@@ -215,6 +215,8 @@ export const validateSignupToken = asyncHandler(
     if (!dbToken) {
       return next(new AppError("Couldn't find token match!", 403));
     }
+
+    // TODO: validate signup token associate email with provided email here
 
     const tokenExpiry = dbToken.expiresAt as Date;
     const tokenIsExpired = new Date(Date.now()) > new Date(tokenExpiry);
@@ -225,6 +227,7 @@ export const validateSignupToken = asyncHandler(
       );
     }
 
+    delete req.body["signupToken"];
     res.locals.dbToken = dbToken;
     next();
   }
