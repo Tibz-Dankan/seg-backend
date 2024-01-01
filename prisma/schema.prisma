@@ -22,7 +22,7 @@ model User {
   firstName              String        @db.Text
   lastName               String        @db.Text
   email                  String        @unique @db.Text
-  phoneNumber            String        @unique @db.Text
+  phoneNumber            String
   gender                 Gender
   role                   Role          @default(admin)
   password               String        @db.Text
@@ -45,7 +45,7 @@ model SignupToken {
   tokenId           String    @id @default(uuid())
   User              User      @relation(fields: [generatedByUserId], references: [userId])
   generatedByUserId String    @db.Text
-  token             Int
+  token             Int //To make each unique
   associatedEmail   String    @db.Text
   associatedRole    Role      @default(admin)
   used              Boolean   @default(false)

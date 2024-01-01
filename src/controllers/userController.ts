@@ -9,6 +9,7 @@ import { Upload } from "../utils/upload";
 import { Email } from "../utils/email";
 import mime from "mime-types";
 import { updateSignupTokenAsUsed } from "./tokenController";
+import { Gender } from "../types/gender";
 
 const prisma = new PrismaClient();
 const User = prisma.user;
@@ -56,17 +57,34 @@ const authenticate = async (
   });
 };
 
+const validateGender = (gender: string): boolean => {
+  const isMale = gender === Gender.MALE;
+  const isFemale = gender === Gender.FEMALE;
+
+  if (isMale || isFemale) {
+    return true;
+  }
+  return false;
+};
+
 export const signUp = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const firstName = req.body.firstName as string;
     const lastName = req.body.lastName as string;
-    const phoneNumber = req.body.phoneNumber as string;
+    const phone = req.body.phoneNumber as string;
     const email = req.body.email as string;
+    const gender = req.body.gender as string;
     const password = req.body.password as string;
     const dbToken = res.locals.dbToken;
 
-    if (!email || !phoneNumber || !firstName || !lastName || !password) {
+    if (!email || !phone || !firstName || !lastName || !password || !gender) {
       return next(new AppError("Please fill out all fields", 400));
+    }
+    if (!email.includes("@")) {
+      return next(new AppError("Please provide a valid email", 400));
+    }
+    if (!validateGender(gender)) {
+      return next(new AppError("Please provide a valid gender", 400));
     }
     const user = await User.findFirst({
       where: { email: { equals: email } },

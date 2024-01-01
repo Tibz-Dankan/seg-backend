@@ -5,7 +5,7 @@ import logger from "morgan";
 import http from "http";
 import { errorController } from "./controllers/errorController";
 import { rateLimitController } from "./controllers/rateLimitController";
-import { userRoutes } from "./routes/userRoutes";
+import { userRoutes } from "./routes/auth/userRoutes";
 import { tokenRoutes } from "./routes/tokenRoutes";
 
 dotenv.config();
@@ -43,3 +43,5 @@ const PORT = 3000 || process.env.PORT;
 server.listen(PORT, () => {
   console.log(`SEG server running on port ${PORT}`);
 });
+
+export { server };
