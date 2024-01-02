@@ -6,7 +6,7 @@ import http from "http";
 import { errorController } from "./controllers/errorController";
 import { rateLimitController } from "./controllers/rateLimitController";
 import { userRoutes } from "./routes/auth/userRoutes";
-import { tokenRoutes } from "./routes/tokenRoutes";
+import { tokenRoutes } from "./routes/token/tokenRoutes";
 
 dotenv.config();
 
