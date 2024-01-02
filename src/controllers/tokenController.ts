@@ -95,7 +95,7 @@ export const getSignupTokensByGeneratedByUserId = asyncHandler(
       where: { generatedByUserId: { equals: generatedByUserId } },
     });
 
-    if (!tokens) {
+    if (!tokens[0]) {
       return next(new AppError("No tokens found for this user", 404));
     }
 
@@ -111,7 +111,7 @@ export const getAllSignupTokens = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const tokens = await SignupToken.findMany({});
 
-    if (!tokens) {
+    if (!tokens[0]) {
       return next(new AppError("No tokens found", 404));
     }
 
