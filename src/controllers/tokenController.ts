@@ -127,7 +127,6 @@ export const editSignupToken = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const tokenId = req.params.tokenId;
     const userId = res.locals.user.userId as string;
-    console.log("tokenId", tokenId);
     if (!tokenId) {
       return next(new AppError("Please provide tokenId", 400));
     }
