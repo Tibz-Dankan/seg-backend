@@ -5,7 +5,7 @@ import { Response } from "supertest";
 import { prisma } from "../../../test/prisma";
 import { hash } from "bcryptjs";
 
-describe("[GET] /api/v1/generate-signup-token", async () => {
+describe("[GET] /api/v1/get-signup-token-generatedByUserd", async () => {
   it("returns a 400 for  a missing generatedByUserId", async () => {
     const newUser = await prisma.user.create({
       data: {
