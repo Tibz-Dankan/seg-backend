@@ -18,6 +18,10 @@ router.get(
 );
 router.get("/get-all-tokens", protectSuperAdmin, getAllSignupTokens);
 router.patch("/edit-signup-token/:tokenId", protectSuperAdmin, editSignupToken);
-router.delete("/delete-signup-token", protectSuperAdmin, deleteSignupToken);
+router.delete(
+  "/delete-signup-token/:tokenId",
+  protectSuperAdmin,
+  deleteSignupToken
+);
 
 export { router as tokenRoutes };

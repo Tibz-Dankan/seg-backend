@@ -180,13 +180,13 @@ export const deleteSignupToken = asyncHandler(
     const token = await SignupToken.findFirst({
       where: { tokenId: { equals: tokenId } },
     });
+    if (!token) {
+      return next(new AppError("Token not found", 404));
+    }
     if (userId !== token?.generatedByUserId) {
       return next(
         new AppError("Not authorized to perform this operation", 401)
       );
-    }
-    if (!token) {
-      return next(new AppError("Token not found", 404));
     }
     if (token.used) {
       return next(new AppError("Can't delete already used token", 400));
