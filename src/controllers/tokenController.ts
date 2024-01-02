@@ -127,7 +127,6 @@ export const editSignupToken = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const tokenId = req.params.tokenId;
     const userId = res.locals.user.userId as string;
-    console.log("tokenId", tokenId);
     if (!tokenId) {
       return next(new AppError("Please provide tokenId", 400));
     }
@@ -181,13 +180,13 @@ export const deleteSignupToken = asyncHandler(
     const token = await SignupToken.findFirst({
       where: { tokenId: { equals: tokenId } },
     });
+    if (!token) {
+      return next(new AppError("Token not found", 404));
+    }
     if (userId !== token?.generatedByUserId) {
       return next(
         new AppError("Not authorized to perform this operation", 401)
       );
-    }
-    if (!token) {
-      return next(new AppError("Token not found", 404));
     }
     if (token.used) {
       return next(new AppError("Can't delete already used token", 400));
