@@ -357,6 +357,10 @@ export const changePassword = asyncHandler(
     const currentPassword = req.body.currentPassword as string;
     const newPassword = req.body.newPassword as string;
 
+    if (!userId) {
+      return next(new AppError("Please provide  userId", 400));
+    }
+
     const user = await User.findFirst({
       where: { userId: { equals: userId } },
     });
