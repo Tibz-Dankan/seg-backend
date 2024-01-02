@@ -6,7 +6,7 @@ import { prisma } from "../../../test/prisma";
 import { hash } from "bcryptjs";
 import { resolve } from "path";
 
-describe("[PATCH] /upload-user-image/:userId", async () => {
+describe("[PATCH] /api/v1/upload-user-image/:userId", async () => {
   it("returns a 200 on successfully uploading image", async () => {
     const newUser = await prisma.user.create({
       data: {
@@ -31,7 +31,7 @@ describe("[PATCH] /upload-user-image/:userId", async () => {
     const imagePath = resolve("./src/test/assets/test-image.png");
 
     return request(app)
-      .patch(`/upload-user-image/${newUser.userId}`)
+      .patch(`/api/v1/users/upload-user-image/${newUser.userId}`)
       .attach("file", imagePath)
       .set("Authorization", `Bearer ${res.body.accessToken}`)
       .expect(200);
@@ -61,7 +61,7 @@ describe("[PATCH] /upload-user-image/:userId", async () => {
     const imagePath = resolve("./src/test/assets/test-ppt.pptx");
 
     return request(app)
-      .patch(`/upload-user-image/${newUser.userId}`)
+      .patch(`/api/v1/users/upload-user-image/${newUser.userId}`)
       .attach("file", imagePath)
       .set("Authorization", `Bearer ${res.body.accessToken}`)
       .expect(400);
@@ -91,7 +91,7 @@ describe("[PATCH] /upload-user-image/:userId", async () => {
     const imagePath = resolve("./src/test/assets/test-image.png");
 
     return request(app)
-      .patch(`/upload-user-image/${"someUserId"}`)
+      .patch(`/api/v1/users/upload-user-image/${"someUserId"}`)
       .attach("file", imagePath)
       .set("Authorization", `Bearer ${res.body.accessToken}`)
       .expect(404);
