@@ -1,12 +1,12 @@
 import express from "express";
-import { protectSuperAdmin } from "../controllers/userController";
+import { protectSuperAdmin } from "../../controllers/userController";
 import {
   generateSignupToken,
   getSignupTokensByGeneratedByUserId,
   editSignupToken,
   deleteSignupToken,
   getAllSignupTokens,
-} from "../controllers/tokenController";
+} from "../../controllers/tokenController";
 
 const router = express.Router();
 
