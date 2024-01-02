@@ -17,7 +17,7 @@ router.get(
   getSignupTokensByGeneratedByUserId
 );
 router.get("/get-all-tokens", protectSuperAdmin, getAllSignupTokens);
-router.patch("/edit-signup-token", protectSuperAdmin, editSignupToken);
+router.patch("/edit-signup-token/:tokenId", protectSuperAdmin, editSignupToken);
 router.delete("/delete-signup-token", protectSuperAdmin, deleteSignupToken);
 
 export { router as tokenRoutes };
