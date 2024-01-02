@@ -1,8 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 import { server as app } from "../../../app";
 import request from "supertest";
 import { Response } from "supertest";
-import { randomBytes, createHash } from "crypto";
 import { prisma } from "../../../test/prisma";
 import { hash } from "bcryptjs";
 
