@@ -283,9 +283,15 @@ export const editUserDetails = asyncHandler(
     const userId = req.params.userId as string;
     const firstName = req.body.firstName as string;
     const lastName = req.body.lastName as string;
+    const gender = req.body.gender as string;
+    const email = req.body.email as string;
+    const phone = req.body.phoneNumber as string;
 
     if (!firstName) return next(new AppError("Please provide first name", 400));
     if (!lastName) return next(new AppError("Please provide last name", 400));
+    if (!gender) return next(new AppError("Please provide gender", 400));
+    if (!email) return next(new AppError("Please provide email", 400));
+    if (!phone) return next(new AppError("Please provide phone number", 400));
 
     const user = await User.findFirst({
       where: { userId: { equals: userId } },
@@ -293,9 +299,29 @@ export const editUserDetails = asyncHandler(
     if (!user) {
       return next(new AppError("we couldn't find user with userId", 404));
     }
+    if (!email.includes("@")) {
+      return next(new AppError("Please provide a valid email", 400));
+    }
+    if (!validateGender(gender)) {
+      return next(new AppError("Please provide a valid gender", 400));
+    }
+
+    if (user.email !== email) {
+      const savedUser = await User.findFirst({
+        where: { email: { equals: email } },
+      });
+      if (savedUser) {
+        return next(
+          new AppError("Can't update to already registered email", 400)
+        );
+      }
+    }
+
     user.firstName = req.body.firstName;
     user.lastName = req.body.lastName;
     user.gender = req.body.gender;
+    user.email = req.body.email;
+    user.phoneNumber = req.body.phoneNumber;
 
     await User.update({
       where: { userId: user.userId },
