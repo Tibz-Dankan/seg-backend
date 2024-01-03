@@ -267,8 +267,15 @@ export const validateSignupToken = asyncHandler(
     if (!dbToken) {
       return next(new AppError("Couldn't find token match!", 403));
     }
-
-    // TODO: validate signup token associate email with provided email here
+    const email = req.body.email;
+    if (email !== dbToken.associatedEmail) {
+      return next(
+        new AppError(
+          "Provided email does not match token associated email!",
+          403
+        )
+      );
+    }
 
     const tokenExpiry = dbToken.expiresAt as Date;
     const tokenIsExpired = new Date(Date.now()) > new Date(tokenExpiry);
