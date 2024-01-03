@@ -143,9 +143,7 @@ export const forgotPassword = asyncHandler(
     });
 
     if (!user) {
-      return next(
-        new AppError("There is no user with supplied phone number", 404)
-      );
+      return next(new AppError("There is no user with provided email", 404));
     }
 
     const resetToken = randomBytes(32).toString("hex");
