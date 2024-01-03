@@ -4,6 +4,8 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { PrismaClient } from "@prisma/client";
 import { RandomNumber } from "../utils/random";
 import { Role } from "../types/role";
+import { Email } from "../utils/email";
+import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
 const SignupToken = prisma.signupToken;
@@ -29,6 +31,56 @@ const validateRole = (role: string): boolean => {
     return true;
   }
   return false;
+};
+
+export const generateSendTokensOnAppStart = async () => {
+  const tokens = await SignupToken.findMany({});
+  if (tokens[0]) return;
+
+  const INIT_ADMIN_EMAIL_LIST = process.env.INIT_ADMIN_EMAIL_LIST!;
+  const emailList: string[] = JSON.parse(INIT_ADMIN_EMAIL_LIST);
+
+  const buildEmailList = (): string[] => {
+    const mailList: string[] = [];
+
+    emailList.map((mail: string) => {
+      if (mail) mailList.push(mail);
+    });
+    return mailList;
+  };
+
+  console.log("buildEmailList", buildEmailList());
+  const systemUser = await prisma.user.create({
+    data: {
+      firstName: "system",
+      lastName: "system",
+      gender: "male",
+      email: "system",
+      phoneNumber: "0000000000",
+      role: "superadmin",
+      password: await hash("password", 10),
+    },
+    select: { userId: true },
+  });
+
+  buildEmailList().map(async (email, index) => {
+    const token = new RandomNumber().d8();
+    const tokenExpiresAt = new Date(
+      Date.now() + 24 * 60 * 60 * 1000
+    ).toISOString(); //24 hours
+
+    await SignupToken.create({
+      data: {
+        token: token,
+        associatedEmail: email,
+        associatedRole: Role.SUPERADMIN,
+        generatedByUserId: systemUser.userId,
+        expiresAt: tokenExpiresAt,
+      },
+    });
+    await new Email(email, "Initial Signup Token").sendInitSignUpToken(token);
+    console.log(`Token mail ${index + 1} sent -->`, token);
+  });
 };
 
 export const generateSignupToken = asyncHandler(

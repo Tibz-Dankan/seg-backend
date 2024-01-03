@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node-dev src/app.ts",
+    "start": "ts-node-dev src/index.ts",
     "pretest": "cross-env NODE_ENV=test npx prisma migrate dev --name init",
     "test": "cross-env NODE_ENV=test vitest --poolOptions.threads.singleThread --test-timeout=10000",
     "test:ui": "cross-env NODE_ENV=test vitest --poolOptions.threads.singleThread --ui --test-timeout=10000"
