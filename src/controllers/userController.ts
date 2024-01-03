@@ -207,7 +207,7 @@ export const resetPassword = asyncHandler(
   }
 );
 
-export const protectAdmin = asyncHandler(
+export const protect = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers["authorization"];
     let token;
@@ -229,11 +229,6 @@ export const protectAdmin = asyncHandler(
     if (!user) {
       return next(
         new AppError("The user belonging to this token no longer exist!", 403)
-      );
-    }
-    if (user.role !== "admin") {
-      return next(
-        new AppError("Not authorized to perform this operation!", 401)
       );
     }
 
