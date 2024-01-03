@@ -13,7 +13,7 @@ dotenv.config();
 const app = express();
 
 if (process.env.NODE_ENV === "production") {
-  app.use(cors({ origin: process.env.FRONTEND_URL }));
+  app.use(cors({ origin: "*" }));
 } else {
   app.use(cors());
 }
@@ -36,12 +36,6 @@ app.use("*", (req: Request, res: Response) => {
     status: "fail",
     message: "Endpoint not found!",
   });
-});
-
-const PORT = 3000 || process.env.PORT;
-
-server.listen(PORT, () => {
-  console.log(`SEG server running on port ${PORT}`);
 });
 
 export { server };

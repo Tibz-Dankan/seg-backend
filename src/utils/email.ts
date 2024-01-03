@@ -71,4 +71,15 @@ export class Email {
     );
     await this.sendHtml(html, "Contact Us Message");
   }
+
+  async sendInitSignUpToken(token: number) {
+    const html = pug.renderFile(
+      path.join(__dirname, "../views/email/signupToken.pug"),
+      {
+        subject: "Initial Signup Token",
+        token: token,
+      }
+    );
+    await this.sendHtml(html, "Initial Signup Token");
+  }
 }
