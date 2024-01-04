@@ -5,7 +5,7 @@ let requestLimit: number;
 if (process.env.NODE_ENV === "test") {
   requestLimit = 40;
 } else {
-  requestLimit = 12;
+  requestLimit = 15;
 }
 
 export const rateLimitController = rateLimit({
