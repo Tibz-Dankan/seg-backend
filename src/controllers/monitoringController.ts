@@ -1,6 +1,7 @@
 import promClient from "prom-client";
 import { Response, Request, NextFunction } from "express";
 import { asyncHandler } from "../utils/asyncHandler";
+import url from "url";
 
 const register = new promClient.Registry();
 
@@ -35,7 +36,7 @@ export const endRequestMonitoringTimer = (
   const statusCode = res.statusCode.toString();
 
   httpRequestDurationMicroseconds
-    .labels(req.method, req.route.path, statusCode)
+    .labels(req.method, req.url, statusCode)
     .observe(responseTimeInMs);
 
   next();
@@ -49,7 +50,7 @@ export const getMetrics = asyncHandler(
     const statusCode = res.statusCode.toString();
 
     httpRequestDurationMicroseconds
-      .labels(req.method, req.route.path, statusCode)
+      .labels(req.method, req.url, statusCode)
       .observe(responseTimeInMs);
 
     const metrics = await register.metrics();
