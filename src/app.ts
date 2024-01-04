@@ -34,7 +34,9 @@ app.use(startRequestMonitoringTimer);
 
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/tokens", tokenRoutes);
-app.use("/api/v1/monitoring", monitoringRoutes);
+
+app.use(monitoringRoutes);
+app.use(endRequestMonitoringTimer);
 
 app.use(errorController);
 
@@ -44,7 +46,5 @@ app.use("*", (req: Request, res: Response) => {
     message: "Endpoint not found!",
   });
 });
-
-app.use(endRequestMonitoringTimer);
 
 export { server };

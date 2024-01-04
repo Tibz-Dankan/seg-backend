@@ -17,8 +17,6 @@ const httpRequestDurationMicroseconds = new promClient.Histogram({
   buckets: [0.1, 5, 15, 50, 100, 200, 300, 400, 500], // buckets for response time from 0.1ms to 500ms
 });
 
-register.registerMetric(httpRequestDurationMicroseconds);
-
 export const startRequestMonitoringTimer = (
   req: Request,
   res: Response,
@@ -46,6 +44,15 @@ export const endRequestMonitoringTimer = (
 export const getMetrics = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     res.setHeader("Content-Type", register.contentType);
-    res.end(register.metrics());
+
+    const responseTimeInMs = Date.now() - res.locals.startTimeInMs;
+    const statusCode = res.statusCode.toString();
+
+    httpRequestDurationMicroseconds
+      .labels(req.method, req.route.path, statusCode)
+      .observe(responseTimeInMs);
+
+    const metrics = await register.metrics();
+    res.status(200).send(metrics);
   }
 );
