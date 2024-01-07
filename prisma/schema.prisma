@@ -33,7 +33,8 @@ model User {
   createdAt              DateTime      @default(now())
   updatedAt              DateTime?     @updatedAt
   AccessTokens           AccessToken[]
-  SignupToken            SignupToken[]
+  SignupTokens           SignupToken[]
+  Events                 Event[]
 
   @@index([userId])
   @@index([email])
@@ -72,6 +73,42 @@ model AccessToken {
   @@index([userId])
   @@index([token])
   @@map("_access_tokens")
+}
+
+enum EventCategory {
+  exhibition
+  conference
+}
+
+model Event {
+  eventId      String        @id @default(uuid())
+  User         User          @relation(fields: [postByUserId], references: [userId])
+  postByUserId String
+  category     EventCategory @default(exhibition)
+  title        String        @db.Text
+  description  String        @db.Text
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime?     @updatedAt
+  EventImages  EventImage[]
+
+  @@index([eventId])
+  @@index([postByUserId])
+  @@index([category])
+  @@map("_events")
+}
+
+model EventImage {
+  eventImageId String    @id @default(uuid())
+  Event        Event     @relation(fields: [eventId], references: [eventId])
+  eventId      String
+  imageUrl     String?   @db.Text
+  imagePath    String?   @db.Text
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime? @updatedAt
+
+  @@index([eventImageId])
+  @@index([eventId])
+  @@map("_event_images")
 }
 
 // PRISMA COMMNANDS 
