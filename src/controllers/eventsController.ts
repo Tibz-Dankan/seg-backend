@@ -74,9 +74,6 @@ export const uploadEventImages = asyncHandler(
       const upload = await new Upload(imagePath, next).add(files[i]);
       const url = upload?.url as string;
 
-      console.log("url from firebase");
-      console.log(url);
-
       await EventImage.create({
         data: { eventId: eventId, imageUrl: url, imagePath: imagePath },
       });
@@ -92,6 +89,44 @@ export const uploadEventImages = asyncHandler(
       status: "success",
       message: "Event created successfully",
       data: { event: event },
+    });
+  }
+);
+
+export const updateEvent = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const title = req.body.title as string;
+    const category = req.body.category as EventCategory;
+    const description = req.body.description as string;
+    const eventId = req.params.eventId;
+
+    if (!eventId) {
+      return next(new AppError("Please provide eventId", 400));
+    }
+    if (!title || !category || !description) {
+      return next(new AppError("Please fill out all fields", 400));
+    }
+    if (!validateEventCategory(category)) {
+      return next(new AppError("Please provide a valid event category", 400));
+    }
+
+    const updatedEvent = await Event.update({
+      where: { eventId: eventId },
+      data: req.body,
+      select: {
+        eventId: true,
+        title: true,
+        category: true,
+        description: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Event created successfully",
+      data: { event: updatedEvent },
     });
   }
 );
