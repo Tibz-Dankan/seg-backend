@@ -81,7 +81,7 @@ export const uploadEventImages = asyncHandler(
 
     const eventImages = await EventImage.findMany({
       where: { eventId: { equals: eventId } },
-      select: { imageUrl: true },
+      select: { eventImageId: true, imageUrl: true },
     });
     event.eventImages = eventImages;
 
@@ -125,8 +125,62 @@ export const updateEvent = asyncHandler(
 
     res.status(200).json({
       status: "success",
-      message: "Event created successfully",
+      message: "Event updated successfully",
       data: { event: updatedEvent },
+    });
+  }
+);
+
+export const getEvent = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const eventId = req.params.eventId;
+    if (!eventId) return next(new AppError("Please provide eventId", 400));
+
+    const event = await Event.findFirst({
+      where: { eventId: eventId },
+      include: {
+        eventImages: {
+          select: { eventImageId: true, imageUrl: true },
+        },
+      },
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Event fetched successfully",
+      data: { event: event },
+    });
+  }
+);
+
+export const getAllEvents = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const skip = Number(req.query.skip);
+    const take = Number(req.query.take);
+    const page = Number(req.query.page);
+
+    if (skip !== 0 && !skip) {
+      return next(new AppError("Please provide skip", 400));
+    }
+    if (!take) return next(new AppError("Please provide take", 400));
+    if (!page) return next(new AppError("Please provide page number", 400));
+
+    const event = await Event.findMany({
+      include: {
+        eventImages: {
+          select: { eventImageId: true, imageUrl: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: take,
+      skip: skip,
+    });
+    // const event = await Event.findMany();
+
+    res.status(200).json({
+      status: "success",
+      message: "Events fetched successfully",
+      data: { event: event },
     });
   }
 );
