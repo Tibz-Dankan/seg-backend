@@ -5,6 +5,7 @@ import {
   postEvent,
   uploadEventImages,
   updateEvent,
+  deleteEvent,
   getEvent,
   getAllEvents,
   updateEventImage,
@@ -21,6 +22,7 @@ router.post(
   uploadEventImages
 );
 router.patch("/update-event/:eventId", protectSuperAdmin, updateEvent);
+router.delete("/delete-event/:eventId", protectSuperAdmin, deleteEvent);
 router.get("/get-event/:eventId", getEvent);
 router.get("/get-all-events", getAllEvents);
 router.patch(

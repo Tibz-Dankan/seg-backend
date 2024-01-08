@@ -99,7 +99,7 @@ model Event {
 
 model EventImage {
   eventImageId String    @id @default(uuid())
-  Event        Event     @relation(fields: [eventId], references: [eventId])
+  Event        Event     @relation(fields: [eventId], references: [eventId], onDelete: Cascade, onUpdate: Cascade)
   eventId      String
   imageUrl     String?   @db.Text
   imagePath    String?   @db.Text

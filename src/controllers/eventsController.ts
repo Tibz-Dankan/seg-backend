@@ -131,6 +131,28 @@ export const updateEvent = asyncHandler(
   }
 );
 
+export const deleteEvent = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const eventId = req.params.eventId;
+    if (!eventId) return next(new AppError("Please provide eventId", 400));
+
+    const event = await Event.findFirst({
+      where: { eventId: eventId },
+    });
+
+    if (!event) {
+      return next(new AppError("event with provided Id is not found", 404));
+    }
+    // TODO: delete images for even from firebase
+    await Event.delete({ where: { eventId: eventId } });
+
+    res.status(200).json({
+      status: "success",
+      message: "Event deleted successfully",
+    });
+  }
+);
+
 export const getEvent = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const eventId = req.params.eventId;
