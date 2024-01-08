@@ -183,3 +183,67 @@ export const getAllEvents = asyncHandler(
     });
   }
 );
+
+export const updateEventImage = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const file = req.file as TFile;
+    const eventImageId = req.params.eventImageId;
+    if (!file) return next(new AppError("Please provide event image", 400));
+    if (!eventImageId) {
+      return next(new AppError("Please provide eventImageId", 400));
+    }
+
+    const savedImage = await EventImage.findFirst({
+      where: { eventImageId: eventImageId },
+    });
+    if (!savedImage) {
+      return next(new AppError("Image with provided Id is not found", 404));
+    }
+    const savedImagePath = savedImage?.imagePath as string;
+
+    const imagePath = `events/${Date.now()}_${file.originalname}`;
+    const upload = await new Upload(imagePath, next).update(
+      file,
+      savedImagePath
+    );
+
+    const url = upload?.url as string;
+
+    const updatedEventImage = await EventImage.update({
+      where: { eventImageId: eventImageId },
+      data: { imageUrl: url, imagePath: imagePath },
+      select: { eventImageId: true, imageUrl: true },
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Event Image updated successfully",
+      data: { eventImage: updatedEventImage },
+    });
+  }
+);
+
+export const deleteEventImage = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const eventImageId = req.params.eventImageId;
+    if (!eventImageId) {
+      return next(new AppError("Please provide eventImageId", 400));
+    }
+
+    const savedImage = await EventImage.findFirst({
+      where: { eventImageId: eventImageId },
+    });
+    if (!savedImage) {
+      return next(new AppError("Image with provided Id is not found", 404));
+    }
+    const savedImagePath = savedImage?.imagePath as string;
+
+    await new Upload(savedImagePath, next).delete();
+    await EventImage.delete({ where: { eventImageId: eventImageId } });
+
+    res.status(200).json({
+      status: "success",
+      message: "Event Image deleted successfully",
+    });
+  }
+);
