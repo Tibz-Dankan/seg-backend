@@ -175,7 +175,6 @@ export const getAllEvents = asyncHandler(
       take: take,
       skip: skip,
     });
-    // const event = await Event.findMany();
 
     res.status(200).json({
       status: "success",
