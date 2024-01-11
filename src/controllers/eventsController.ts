@@ -40,6 +40,9 @@ export const postEvent = asyncHandler(
     if (files == undefined) {
       return next(new AppError("Please Provide at least one event photo", 400));
     }
+    if (!files[0]) {
+      return next(new AppError("Please Provide at least one event photo", 400));
+    }
 
     const newEvent = await Event.create({
       data: {
