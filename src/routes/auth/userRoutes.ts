@@ -9,6 +9,7 @@ import {
   updateUserImage,
   protect,
   getUser,
+  signUp,
 } from "../../controllers/userController";
 import { uploadFile } from "../../utils/upload";
 import { validateSignupToken } from "../../controllers/tokenController";
@@ -16,6 +17,7 @@ import { validateSignupToken } from "../../controllers/tokenController";
 const router = express.Router();
 
 router.post("/signup", validateSignupToken, signUpAdmin);
+router.post("/signup-user", signUp);
 router.post("/signin", signIn);
 router.post("/forgot-password", forgotPassword);
 router.patch("/reset-password/:token", resetPassword);

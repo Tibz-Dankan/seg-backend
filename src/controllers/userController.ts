@@ -92,6 +92,7 @@ export const signUp = asyncHandler(
 
     const salt = await genSalt(10);
     req.body.password = await hash(req.body.password, salt);
+    req.body.role = "user";
 
     const newUser = await User.create({
       data: req.body,
