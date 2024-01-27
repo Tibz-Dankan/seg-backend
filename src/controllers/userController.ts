@@ -75,6 +75,48 @@ export const signUp = asyncHandler(
     const email = req.body.email as string;
     const gender = req.body.gender as string;
     const password = req.body.password as string;
+
+    if (!email || !phone || !firstName || !lastName || !password || !gender) {
+      return next(new AppError("Please fill out all fields", 400));
+    }
+    if (!email.includes("@")) {
+      return next(new AppError("Please provide a valid email", 400));
+    }
+    if (!validateGender(gender)) {
+      return next(new AppError("Please provide a valid gender", 400));
+    }
+    const user = await User.findFirst({
+      where: { email: { equals: email } },
+    });
+    if (user) return next(new AppError("Email already taken", 400));
+
+    const salt = await genSalt(10);
+    req.body.password = await hash(req.body.password, salt);
+
+    const newUser = await User.create({
+      data: req.body,
+      select: {
+        userId: true,
+        firstName: true,
+        lastName: true,
+        phoneNumber: true,
+        role: true,
+        imageUrl: true,
+      },
+    });
+
+    authenticate(newUser, 201, res);
+  }
+);
+
+export const signUpAdmin = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const firstName = req.body.firstName as string;
+    const lastName = req.body.lastName as string;
+    const phone = req.body.phoneNumber as string;
+    const email = req.body.email as string;
+    const gender = req.body.gender as string;
+    const password = req.body.password as string;
     const dbToken = res.locals.dbToken;
 
     if (!email || !phone || !firstName || !lastName || !password || !gender) {
