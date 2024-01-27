@@ -111,6 +111,17 @@ model EventImage {
   @@map("_event_images")
 }
 
+model NewsLetter {
+  newsLetterId String    @id @default(uuid())
+  email        String    @unique @db.Text
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime? @updatedAt
+
+  @@index([newsLetterId])
+  @@index([email])
+  @@map("_news_letter")
+}
+
 // PRISMA COMMNANDS 
 
 // INITIALIZE PRISMA
