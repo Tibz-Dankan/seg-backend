@@ -28,3 +28,20 @@ export const subscribeToNewsLetter = asyncHandler(
     });
   }
 );
+
+export const getAllNewsLetterSubscribers = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const subscribers = await NewsLetter.findMany({});
+    if (!subscribers) {
+      return next(new AppError("No subscribers found", 404));
+    }
+
+    res.status(201).json({
+      status: "success",
+      message: "fetched subscribers",
+      data: {
+        subscribers: subscribers,
+      },
+    });
+  }
+);
