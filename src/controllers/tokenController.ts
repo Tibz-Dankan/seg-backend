@@ -145,6 +145,20 @@ export const getSignupTokensByGeneratedByUserId = asyncHandler(
     }
     const tokens = await SignupToken.findMany({
       where: { generatedByUserId: { equals: generatedByUserId } },
+      include: {
+        User: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+            phoneNumber: true,
+            gender: true,
+            role: true,
+            imageUrl: true,
+            createdAt: true,
+          },
+        },
+      },
     });
 
     if (!tokens[0]) {
@@ -161,7 +175,22 @@ export const getSignupTokensByGeneratedByUserId = asyncHandler(
 
 export const getAllSignupTokens = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const tokens = await SignupToken.findMany({});
+    const tokens = await SignupToken.findMany({
+      include: {
+        User: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+            phoneNumber: true,
+            gender: true,
+            role: true,
+            imageUrl: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
 
     if (!tokens[0]) {
       return next(new AppError("No tokens found", 404));
