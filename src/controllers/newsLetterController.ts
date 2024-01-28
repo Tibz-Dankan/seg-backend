@@ -36,7 +36,7 @@ export const getAllNewsLetterSubscribers = asyncHandler(
       return next(new AppError("No subscribers found", 404));
     }
 
-    res.status(201).json({
+    res.status(200).json({
       status: "success",
       message: "fetched subscribers",
       data: {
