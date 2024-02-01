@@ -488,3 +488,69 @@ export const getUser = asyncHandler(
     });
   }
 );
+
+export const getUsersOfRoleUser = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const users = await User.findMany({
+      where: { role: { equals: "user" } },
+      select: {
+        userId: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        imageUrl: true,
+        createdAt: true,
+        updatedAt: true,
+        AccessTokens: {
+          select: { createdAt: true },
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "User fetched successfully",
+      data: { users: users },
+    });
+  }
+);
+
+export const getUsersOfRoleAdmin = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const users = await User.findMany({
+      where: {
+        OR: [
+          {
+            role: { equals: "admin" },
+          },
+          { firstName: { equals: "superadmin" } },
+        ],
+        NOT: {
+          firstName: { equals: "system" },
+        },
+      },
+      select: {
+        userId: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        imageUrl: true,
+        createdAt: true,
+        updatedAt: true,
+        AccessTokens: {
+          select: { createdAt: true },
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "User fetched successfully",
+      data: { users: users },
+    });
+  }
+);

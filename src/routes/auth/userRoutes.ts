@@ -10,6 +10,8 @@ import {
   protect,
   getUser,
   signUp,
+  getUsersOfRoleUser,
+  getUsersOfRoleAdmin,
 } from "../../controllers/userController";
 import { uploadFile } from "../../utils/upload";
 import { validateSignupToken } from "../../controllers/tokenController";
@@ -30,5 +32,7 @@ router.patch(
 );
 router.patch("/change-password/:userId", protect, changePassword);
 router.get("/get-user/:userId", getUser);
+router.get("/get-users-by-role-user", protect, getUsersOfRoleUser);
+router.get("/get-users-by-role-admin", protect, getUsersOfRoleAdmin);
 
 export { router as userRoutes };
