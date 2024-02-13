@@ -45,3 +45,32 @@ export const getAllNewsLetterSubscribers = asyncHandler(
     });
   }
 );
+
+export const postNewsLetter = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const email = req.body.email as string;
+
+    const recipients = JSON.parse(req.body.recipients) as string[];
+    const newLettersTitle = req.body.newLettersTitle;
+    const newLettersBody = req.body.newLettersBody;
+
+    if (!newLettersTitle) {
+      new AppError("Please provide newLettersTitle", 400);
+    }
+
+    if (!newLettersBody) {
+      new AppError("Please provide newLettersBody", 400);
+    }
+
+    if (!recipients[0]) {
+      new AppError("Please provide at least one recipient", 400);
+    }
+
+    // TODO: implement the newsLetter sending functionality
+
+    res.status(201).json({
+      status: "success",
+      message: "NewsLetter sent to recipients successfully",
+    });
+  }
+);
