@@ -66,6 +66,8 @@ export const postNewsLetter = asyncHandler(
       new AppError("Please provide at least one recipient", 400);
     }
 
+    // TODO:capture images here
+
     // TODO: implement the newsLetter sending functionality
 
     res.status(201).json({
