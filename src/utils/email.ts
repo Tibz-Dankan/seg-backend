@@ -82,4 +82,23 @@ export class Email {
     );
     await this.sendHtml(html, "Initial Signup Token");
   }
+
+  async sendNewLetter(
+    firstName: string,
+    title: string,
+    body: string,
+    images: any[]
+  ) {
+    const html = pug.renderFile(
+      path.join(__dirname, "../views/email/newsLetter.pug"),
+      {
+        subject: this.subject,
+        firstName: firstName,
+        title: title,
+        body: title,
+        images: images,
+      }
+    );
+    await this.sendHtml(html, "Welcome to SEG MUK");
+  }
 }
