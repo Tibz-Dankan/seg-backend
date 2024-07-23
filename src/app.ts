@@ -39,9 +39,9 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/tokens", tokenRoutes);
 app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1/newsletter", newsLetterRoutes);
-app.use("/active", keepActiveRoutes);
 
 app.use(monitoringRoutes);
+app.use(keepActiveRoutes);
 app.use(endRequestMonitoringTimer);
 
 app.use(errorController);
