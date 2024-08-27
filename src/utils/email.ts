@@ -11,13 +11,13 @@ export class Email {
 
     this.from = process.env.SENDER_EMAIL!;
     this.recipients = recipients;
-    this.subject = subject;
+    this.subject = subject; 
   }
 
   async sendHtml(html: any, subject: string) {
     const mailOptions = {
       to: this.recipients,
-      from: { email: this.from, name: "SEG MUK" },
+      from: { email: this.from, name: "AAPG MUK" },
       subject: subject,
       html: html,
     };
@@ -38,7 +38,7 @@ export class Email {
         firstName: firstName,
       }
     );
-    await this.sendHtml(html, "Welcome to SEG MUK");
+    await this.sendHtml(html, "Welcome to AAPG MUK");
   }
 
   async sendPasswordReset(url: string, firstName: any) {
@@ -99,6 +99,6 @@ export class Email {
         images: images,
       }
     );
-    await this.sendHtml(html, "Welcome to SEG MUK");
+    await this.sendHtml(html, "Welcome to AAPG MUK");
   }
 }
