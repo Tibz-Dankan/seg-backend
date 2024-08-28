@@ -1,32 +1,46 @@
 import path from "path";
 import pug from "pug";
-const SGmail = require("@sendgrid/mail");
+const Mailjet = require("node-mailjet");
 
 export class Email {
   from: string;
   recipients: string;
   subject: string;
   constructor(recipients: string, subject: string) {
-    SGmail.setApiKey(process.env.SENDGRID_API_KEY);
-
-    this.from = process.env.SENDER_EMAIL!;
+    this.from = process.env.MJ_SENDER_MAIL!;
     this.recipients = recipients;
-    this.subject = subject; 
+    this.subject = subject;
   }
 
   async sendHtml(html: any, subject: string) {
-    const mailOptions = {
-      to: this.recipients,
-      from: { email: this.from, name: "AAPG MUK" },
-      subject: subject,
-      html: html,
-    };
+    const mailjet = Mailjet.apiConnect(
+      process.env.MJ_APIKEY_PUBLIC,
+      process.env.MJ_APIKEY_PRIVATE
+    );
+
     try {
-      console.log("sending mail");
-      await SGmail.send(mailOptions);
-      console.log("mail sent");
-    } catch (error) {
-      console.log("error sending email", error);
+      const request = await mailjet.post("send", { version: "v3.1" }).request({
+        Messages: [
+          {
+            From: {
+              Email: this.from,
+              Name: "AAPG MUK",
+            },
+            To: [
+              {
+                Email: this.recipients,
+                Name: "User x",
+              },
+            ],
+            Subject: subject,
+            TextPart: "",
+            HTMLPart: html,
+          },
+        ],
+      });
+      console.log("mail sent:", request);
+    } catch (err: any) {
+      console.log("Error sending mail:", err.statusCode);
     }
   }
 
